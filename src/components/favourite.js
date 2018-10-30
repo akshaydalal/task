@@ -1,35 +1,72 @@
 import React, { Component } from 'react'
+import BeerCard from './beerCard'
 
 export default class favourite extends Component {
+
+  constructor(){
+    super();
+    this.state={
+      beers:[],
+      featured:[],
+      featuredUnique:[]
+    };
+  }
+  
+componentDidMount(){
+  let featured= localStorage.getItem('featured');  
+  let featuredUnique= localStorage.getItem('featuredUnique');      
+  if(featured==null){
+    this.setState({featured:[],beers:[],featuredUnique:[]})
+  } 
+  else{
+   this.setState({featured:JSON.parse(featured),beers:JSON.parse(featured), featuredUnique:JSON.parse(featuredUnique)})
+  }
+  }
+
+  featureBeer=(item,index)=>{
+    let beers=this.state.beers;
+    let featured=this.state.featured;
+    let featuredUnique=this.state.featuredUnique;
+
+    beers[index].featured=!beers[index].featured;
+
+    if(beers[index].featured){     
+      featured.push(beers[index]);     
+      featuredUnique.push(beers[index].name);
+      localStorage.setItem('featured',JSON.stringify(featured))
+      localStorage.setItem('featuredUnique',JSON.stringify(featuredUnique)) 
+    }
+
+    else{
+
+     let index1= featured.findIndex(beer=>beer.name==item.name);
+     let index2= featuredUnique.indexOf(item.name);
+      featured.splice(index1,1);     
+      featuredUnique.splice(index2,1);
+      localStorage.setItem('featured',JSON.stringify(featured))
+      localStorage.setItem('featuredUnique',JSON.stringify(featuredUnique))
+
+
+    }
+
+    this.loadData()   
+
+  }
+  loadData=()=>{
+    let featured= localStorage.getItem('featured');  
+    let featuredUnique= localStorage.getItem('featuredUnique');      
+    if(featured==null){
+      this.setState({featured:[],featuredUnique:[]})
+    } 
+    else{   this.setState({featured:JSON.parse(featured),beers:JSON.parse(featured), featuredUnique:JSON.parse(featuredUnique)})
+
+    }
+  }
+
   render() {
     return (
-      <div>
-
-          <div className="card">
-
-  <div className="card-content">
-    <div className="media">
-      <div className="media-left">
-        <figure className="image is-48x48">
-          <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image" />
-        </figure>
-      </div>
-      <div className="media-content">
-        <p className="title is-4">John Smith</p>
-        <p className="subtitle is-6">@johnsmith</p>
-      </div>
-    </div>
-
-    <div className="content">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-      Phasellus nec iaculis mauris. <a>@bulmaio</a>.
-      <a >#css</a> <a >#responsive</a>
-      <br />
-      <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
-    </div>
-  </div>
-</div>
-        
+      <div className="container">
+      <BeerCard beers={this.state.beers} featureBeer={this.featureBeer} />
       </div>
     )
   }
